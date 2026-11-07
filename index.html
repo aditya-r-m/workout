@@ -72,6 +72,26 @@
         list-style: none;
       }
 
+      .workout-names > li:nth-child(1) {
+        grid-area: 1 / 2;
+        --list-accent: #3478d4;
+      }
+
+      .workout-names > li:nth-child(2) {
+        grid-area: 2 / 2;
+        --list-accent: #36a7a1;
+      }
+
+      .workout-names > li:nth-child(3) {
+        grid-area: 2 / 1;
+        --list-accent: #e49a45;
+      }
+
+      .workout-names > li:nth-child(4) {
+        grid-area: 1 / 1;
+        --list-accent: #d84d4d;
+      }
+
       .workout-list {
         display: grid;
         grid-template-columns: 1fr;
@@ -110,8 +130,9 @@
         background: transparent;
         color: inherit;
         font: inherit;
-        text-align: left;
+        text-align: center;
         cursor: pointer;
+        border: 2px solid var(--list-accent);
         transition: background 480ms ease;
       }
 
@@ -258,11 +279,12 @@
           const card = item.firstElementChild;
           const cardRect = card.getBoundingClientRect();
           for (const workout of item.querySelectorAll(".workout-entry")) {
+            const borderColor = getComputedStyle(workout).borderColor;
             activeAnimations.get(workout)?.cancel();
             const rect = workout.getBoundingClientRect();
             positions.set(
               `workout:${workout.dataset.exerciseId}`,
-              { left: rect.left - cardRect.left, top: rect.top - cardRect.top },
+              { left: rect.left - cardRect.left, top: rect.top - cardRect.top, borderColor },
             );
           }
         }
@@ -277,10 +299,14 @@
 
         const offsetX = previousPosition.left - currentPosition.left;
         const offsetY = previousPosition.top - currentPosition.top;
-        if (offsetX !== 0 || offsetY !== 0) {
+        const borderColor = getComputedStyle(element).borderColor;
+        if (offsetX !== 0 || offsetY !== 0 || previousPosition.borderColor !== borderColor) {
           const keyframes = [
-            { transform: `translate(${offsetX}px, ${offsetY}px)` },
-            { transform: "translate(0, 0)" },
+            {
+              transform: `translate(${offsetX}px, ${offsetY}px)`,
+              borderColor: previousPosition.borderColor,
+            },
+            { transform: "translate(0, 0)", borderColor },
           ];
           const animation = element.animate(
             keyframes,
