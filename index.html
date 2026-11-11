@@ -217,7 +217,7 @@
         "Leg Lunge",
         "Hip Hinge",
         "Push Kick",
-        "Low Kick",
+        "Hook Punch",
         "Pull Up",
         "Dip Up",
         "Push Up",
@@ -238,15 +238,6 @@
           savedOrder = JSON.parse(localStorage.getItem(storageKey));
         } catch (error) {
           status.textContent = "Could not read your saved order. The default order is shown.";
-          return exercises;
-        }
-
-        if (
-          !Array.isArray(savedOrder)
-          || savedOrder.length !== exercises.length
-          || savedOrder.some((id) => !exerciseIds.has(id))
-          || new Set(savedOrder).size !== exercises.length
-        ) {
           return exercises;
         }
 
