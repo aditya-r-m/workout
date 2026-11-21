@@ -125,11 +125,43 @@
       const animationDuration = 700;
       const reducedMotionDuration = 250;
       const swipeThreshold = 40;
+      const currentIndexStorageKey = "workout-current-index";
       let isPortrait = window.matchMedia("(orientation: portrait)").matches;
       let horizontalRadius = isPortrait ? 65 : 115;
       let maximumDepth = horizontalRadius * Math.sin(ringTilt);
 
-      let rotation = 0;
+      function loadCurrentIndex() {
+        let savedIndex;
+        try {
+          savedIndex = window.localStorage.getItem(currentIndexStorageKey);
+        } catch (error) {
+          console.error("Unable to retrieve the saved workout index.", error);
+          return 0;
+        }
+
+        if (savedIndex === null) {
+          return 0;
+        }
+
+        const index = Number(savedIndex);
+        if (!savedIndex.trim() || !Number.isInteger(index) || index < 0 || index >= exercises.length) {
+          console.warn("Ignoring an invalid saved workout index.", savedIndex);
+          return 0;
+        }
+
+        return index;
+      }
+
+      function saveCurrentIndex(index) {
+        try {
+          window.localStorage.setItem(currentIndexStorageKey, String(index));
+        } catch (error) {
+          console.error("Unable to save the current workout index.", error);
+        }
+      }
+
+      let currentIndex = loadCurrentIndex();
+      let rotation = currentIndex * rotationStep;
       let destinationRotation = rotation;
       let animationFrame = null;
       let pointerStart = null;
@@ -213,6 +245,7 @@
         const startRotation = rotation;
         destinationRotation += direction * rotationStep;
         const targetRotation = destinationRotation;
+        currentIndex = (currentIndex + direction + exercises.length) % exercises.length;
 
         if (startRotation === targetRotation) {
           render();
@@ -239,6 +272,7 @@
           }
         }
 
+        saveCurrentIndex(currentIndex);
         animationFrame = requestAnimationFrame(animate);
       }
 
